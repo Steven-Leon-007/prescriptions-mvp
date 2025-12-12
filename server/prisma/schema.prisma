@@ -34,7 +34,7 @@ enum Role {
 
 model Doctor {
   id            String         @id @default(cuid())
-  user          User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String         @unique
   specialty     String?
   prescriptions Prescription[]
@@ -44,7 +44,7 @@ model Doctor {
 
 model Patient {
   id            String         @id @default(cuid())
-  user          User           @relation(fields: [userId], references: [id])
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String         @unique
   birthDate     DateTime?
   prescriptions Prescription[]
