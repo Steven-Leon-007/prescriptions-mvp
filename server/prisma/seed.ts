@@ -98,6 +98,117 @@ async function main() {
             items: true,
         },
     });
+
+    const prescription3 = await prisma.prescription.create({
+        data: {
+            code: 'RX-2025-003',
+            status: 'pending',
+            notes: 'Control de presión arterial',
+            patientId: userPatient.patient!.id,
+            authorId: userDoctor.doctor!.id,
+            items: {
+                create: [
+                    {
+                        name: 'Losartán',
+                        dosage: '50mg',
+                        quantity: 30,
+                        instructions: 'Una vez al día en ayunas',
+                    },
+                    {
+                        name: 'Aspirina',
+                        dosage: '100mg',
+                        quantity: 30,
+                        instructions: 'Una vez al día después del desayuno',
+                    },
+                ],
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    const prescription4 = await prisma.prescription.create({
+        data: {
+            code: 'RX-2025-004',
+            status: 'pending',
+            notes: 'Tratamiento para diabetes tipo 2',
+            patientId: userPatient.patient!.id,
+            authorId: userDoctor.doctor!.id,
+            items: {
+                create: [
+                    {
+                        name: 'Metformina',
+                        dosage: '850mg',
+                        quantity: 60,
+                        instructions: 'Dos veces al día con las comidas',
+                    },
+                ],
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    const prescription5 = await prisma.prescription.create({
+        data: {
+            code: 'RX-2025-005',
+            status: 'consumed',
+            notes: 'Tratamiento para infección respiratoria',
+            consumedAt: new Date('2025-11-20'),
+            patientId: userPatient.patient!.id,
+            authorId: userDoctor.doctor!.id,
+            items: {
+                create: [
+                    {
+                        name: 'Azitromicina',
+                        dosage: '500mg',
+                        quantity: 3,
+                        instructions: 'Una vez al día por 3 días',
+                    },
+                    {
+                        name: 'Loratadina',
+                        dosage: '10mg',
+                        quantity: 10,
+                        instructions: 'Una vez al día si hay alergias',
+                    },
+                ],
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
+
+    const prescription6 = await prisma.prescription.create({
+        data: {
+            code: 'RX-2025-006',
+            status: 'pending',
+            notes: 'Tratamiento preventivo para migraña',
+            patientId: userPatient.patient!.id,
+            authorId: userDoctor.doctor!.id,
+            items: {
+                create: [
+                    {
+                        name: 'Sumatriptán',
+                        dosage: '50mg',
+                        quantity: 6,
+                        instructions: 'Al inicio de la migraña, máximo 2 al día',
+                    },
+                    {
+                        name: 'Naproxeno',
+                        dosage: '550mg',
+                        quantity: 10,
+                        instructions: 'Cada 12 horas si persiste el dolor',
+                    },
+                ],
+            },
+        },
+        include: {
+            items: true,
+        },
+    });
 }
 
 main()
