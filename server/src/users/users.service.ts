@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -58,6 +59,129 @@ export class UsersService {
         patient: true,
       }
     });
+  }
+
+  async findAllWithFilters(query: QueryUserDto) {
+    const { role, query: searchQuery, page = 1, limit = 10 } = query;
+    const skip = (page - 1) * limit;
+
+    const where: any = {};
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (searchQuery) {
+      where.OR = [
+        { name: { contains: searchQuery, mode: 'insensitive' } },
+        { email: { contains: searchQuery, mode: 'insensitive' } },
+      ];
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          createdAt: true,
+          doctor: {
+            select: {
+              id: true,
+              specialty: true,
+            },
+          },
+          patient: {
+            select: {
+              id: true,
+              birthDate: true,
+            },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findDoctors(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [doctors, total] = await Promise.all([
+      this.prisma.doctor.findMany({
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              createdAt: true,
+            },
+          },
+        },
+        orderBy: { user: { createdAt: 'desc' } },
+      }),
+      this.prisma.doctor.count(),
+    ]);
+
+    return {
+      data: doctors,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findPatients(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [patients, total] = await Promise.all([
+      this.prisma.patient.findMany({
+        skip,
+        take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              createdAt: true,
+            },
+          },
+        },
+        orderBy: { user: { createdAt: 'desc' } },
+      }),
+      this.prisma.patient.count(),
+    ]);
+
+    return {
+      data: patients,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(id: string) {
