@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Query,
+  Res,
+  StreamableFile,
 } from '@nestjs/common';
 import { PrescriptionsService } from './prescriptions.service';
 import { CreatePrescriptionDto } from './dto/create-prescription.dto';
@@ -16,6 +18,7 @@ import {
 } from './dto/query-prescription.dto';
 import { Roles, Role } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { Response } from 'express';
 
 @Controller()
 export class PrescriptionsController {
@@ -58,6 +61,24 @@ export class PrescriptionsController {
   @Roles(Role.PATIENT)
   consume(@Param('id') id: string, @CurrentUser() user: any) {
     return this.prescriptionsService.consume(id, user.id);
+  }
+
+  @Get('prescriptions/:id/pdf')
+  @Roles(Role.PATIENT)
+  async downloadPdf(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const pdfBuffer = await this.prescriptionsService.generatePdf(id, user.id);
+
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="prescripcion-${id}.pdf"`,
+      'Content-Length': pdfBuffer.length,
+    });
+
+    return new StreamableFile(pdfBuffer);
   }
 
   @Get('admin/prescriptions')
