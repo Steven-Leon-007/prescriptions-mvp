@@ -12,10 +12,16 @@ import {
   QueryAdminPrescriptionDto,
 } from './dto/query-prescription.dto';
 import { PrescriptionStatus } from '@prisma/client';
+import { PdfService } from './pdf.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PrescriptionsService {
-  constructor(private prisma: PrismaService) { }
+  constructor(
+    private prisma: PrismaService,
+    private pdfService: PdfService,
+    private configService: ConfigService,
+  ) { }
 
   async create(createPrescriptionDto: CreatePrescriptionDto, doctorId: string) {
     const doctor = await this.prisma.doctor.findUnique({
@@ -398,6 +404,60 @@ export class PrescriptionsService {
     });
 
     return updated;
+  }
+
+  async generatePdf(id: string, patientUserId: string): Promise<Buffer> {
+    const patient = await this.prisma.patient.findUnique({
+      where: { userId: patientUserId },
+    });
+
+    if (!patient) {
+      throw new ForbiddenException('No tienes permisos de paciente');
+    }
+
+    const prescription = await this.prisma.prescription.findUnique({
+      where: { id },
+      include: {
+        items: true,
+        patient: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+        author: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!prescription) {
+      throw new NotFoundException('Prescripción no encontrada');
+    }
+
+    if (prescription.patientId !== patient.id) {
+      throw new ForbiddenException(
+        'No tienes permiso para descargar esta prescripción',
+      );
+    }
+
+    const frontendUrl =
+      this.configService.get('APP_ORIGIN') || 'http://localhost:3000';
+
+    return this.pdfService.generatePrescriptionPdf(prescription, frontendUrl);
   }
 
   private async generateUniqueCode(): Promise<string> {
