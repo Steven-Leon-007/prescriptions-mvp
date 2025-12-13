@@ -30,7 +30,6 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'jwt-refresh'
             throw new UnauthorizedException('Refresh token not provided');
         }
 
-        // Verify that the refresh token exists and has not expired
         const storedToken = await this.prisma.refreshToken.findUnique({
             where: { token: refreshToken },
             include: { user: true },
