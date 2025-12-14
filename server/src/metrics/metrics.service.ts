@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class MetricsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getMetrics(from?: string, to?: string) {
     const dateFilter: any = {};
@@ -14,14 +15,12 @@ export class MetricsService {
       if (to) dateFilter.createdAt.lte = new Date(to);
     }
 
-    // Totales
     const [totalDoctors, totalPatients, totalPrescriptions] = await Promise.all([
       this.prisma.doctor.count(),
       this.prisma.patient.count(),
       this.prisma.prescription.count({ where: dateFilter }),
     ]);
 
-    // Por estado
     const [pendingCount, consumedCount] = await Promise.all([
       this.prisma.prescription.count({
         where: { ...dateFilter, status: 'pending' },
@@ -31,21 +30,28 @@ export class MetricsService {
       }),
     ]);
 
-    // Por día
     const prescriptionsByDay = await this.prisma.$queryRaw<
-      Array<{ date: Date; count: bigint }>
-    >`
-      SELECT 
-        DATE(created_at) as date,
-        COUNT(*)::integer as count
-      FROM "Prescription"
-      ${from || to ? `WHERE ${from ? `created_at >= ${new Date(from)}::timestamp` : ''} ${from && to ? 'AND' : ''} ${to ? `created_at <= ${new Date(to)}::timestamp` : ''}` : ''}
-      GROUP BY DATE(created_at)
-      ORDER BY date DESC
-      LIMIT 30
-    `;
-
-    // Top doctores
+      Array<{ date: Date; count: number }>
+    >(
+      Prisma.sql`
+    SELECT 
+      DATE("createdAt") as date,
+      COUNT(*) as count
+    FROM "Prescription"
+    ${from || to
+          ? Prisma.sql`
+          WHERE
+            ${from ? Prisma.sql`"createdAt" >= ${new Date(from)}` : Prisma.empty}
+            ${from && to ? Prisma.sql`AND` : Prisma.empty}
+            ${to ? Prisma.sql`"createdAt" <= ${new Date(to)}` : Prisma.empty}
+        `
+          : Prisma.empty
+        }
+    GROUP BY DATE("createdAt")
+    ORDER BY date DESC
+    LIMIT 30
+  `,
+    );
     const topDoctors = await this.prisma.prescription.groupBy({
       by: ['authorId'],
       _count: {
