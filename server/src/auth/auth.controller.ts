@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, UseGuards, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterDto } from './dto/register.dto';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtRefreshAuthGuard } from '../common/guards/jwt-refresh-auth.guard';
@@ -8,6 +9,15 @@ import type { Response, Request } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) { }
+
+  @Public()
+  @Post('register')
+  async register(
+    @Body() registerDto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    return this.authService.register(registerDto, res);
+  }
 
   @Public()
   @Post('login')

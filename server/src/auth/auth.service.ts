@@ -2,12 +2,15 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,56 @@ export class AuthService {
     private jwtService: JwtService,
     private configService: ConfigService,
   ) { }
+
+  async register(registerDto: RegisterDto, res: Response) {
+    try {
+      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+      const user = await this.prisma.user.create({
+        data: {
+          email: registerDto.email,
+          password: hashedPassword,
+          name: registerDto.name,
+          role: registerDto.role,
+          ...(registerDto.role === 'doctor' && {
+            doctor: {
+              create: { specialty: registerDto.specialty },
+            },
+          }),
+          ...(registerDto.role === 'patient' && {
+            patient: {
+              create: {
+                birthDate: registerDto.birthDate
+                  ? new Date(registerDto.birthDate)
+                  : null,
+              },
+            },
+          }),
+        },
+        include: { doctor: true, patient: true },
+      });
+
+      const { accessToken, refreshToken } = await this.generateTokens(user.id);
+
+      this.setTokensCookies(res, accessToken, refreshToken);
+
+      return {
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+      };
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          throw new ConflictException('El email ya está registrado');
+        }
+      }
+      throw error;
+    }
+  }
 
   async login(email: string, password: string, res: Response) {
     const user = await this.prisma.user.findUnique({
