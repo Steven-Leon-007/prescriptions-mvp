@@ -27,12 +27,10 @@ export class RegisterDto {
   @IsNotEmpty()
   role: Role;
 
-  // Para doctores
   @IsString()
   @IsOptional()
   specialty?: string;
 
-  // Para pacientes
   @IsDateString()
   @IsOptional()
   birthDate?: string;

@@ -28,7 +28,6 @@ export class PdfService {
           'base64',
         );
 
-        // Header con título a la izquierda y QR a la derecha
         const startY = doc.y;
         
         doc
@@ -41,12 +40,10 @@ export class PdfService {
           .font('Helvetica')
           .text(`Código: ${prescription.code}`, 50, startY + 30, { align: 'left' });
 
-        // QR en la misma fila, lado derecho
         doc.image(qrCodeImage, 480, startY - 15, {
           fit: [70, 70],
         });
 
-        // Mover después del header
         doc.y = startY + 80;
 
         doc
@@ -84,7 +81,6 @@ export class PdfService {
           );
         }
 
-        // Columna derecha: DATOS DEL MÉDICO
         doc
           .fontSize(14)
           .font('Helvetica-Bold')
