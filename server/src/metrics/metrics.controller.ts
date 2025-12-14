@@ -7,7 +7,7 @@ export class MetricsController {
   constructor(private readonly metricsService: MetricsService) {}
 
   @Get('metrics')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   getMetrics(@Query('from') from?: string, @Query('to') to?: string) {
     return this.metricsService.getMetrics(from, to);
   }
