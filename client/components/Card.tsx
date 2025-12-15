@@ -4,11 +4,15 @@ interface CardProps {
   children: React.ReactNode;
   title?: string;
   className?: string;
+  onClick?: () => void;
 }
 
-export const Card = ({ children, title, className = '' }: CardProps) => {
+export const Card = ({ children, title, className = '', onClick }: CardProps) => {
   return (
-    <div className={`card ${className}`}>
+    <div 
+      className={`card ${className}`}
+      onClick={onClick}
+    >
       {title && (
         <div className="card-header">
           <h3>{title}</h3>

@@ -162,6 +162,24 @@ export class PrescriptionsController {
     return this.prescriptionsService.findAllForPatient(user.id, query);
   }
 
+  @Get('me/prescriptions/:id')
+  @Roles(Role.patient)
+  @ApiOperation({
+    summary: 'Ver detalle de mi prescripción (Patient)',
+    description: 'Obtiene el detalle completo de una prescripción específica del paciente autenticado.',
+  })
+  @ApiParam({ name: 'id', description: 'ID de la prescripción' })
+  @ApiResponse({
+    status: 200,
+    description: 'Detalle de la prescripción',
+  })
+  @ApiResponse({ status: 401, description: 'No autenticado' })
+  @ApiResponse({ status: 403, description: 'No autorizado - solo puedes ver tus propias prescripciones' })
+  @ApiResponse({ status: 404, description: 'Prescripción no encontrada' })
+  findOnePatient(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.prescriptionsService.findOne(id, user.id, user.role);
+  }
+
   @Patch('prescriptions/:id/consume')
   @Roles(Role.patient)
   @ApiOperation({

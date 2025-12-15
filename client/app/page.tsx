@@ -1,6 +1,29 @@
-import React from 'react'
+'use client';
+
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store';
 
 const HomePage = () => {
+  const router = useRouter();
+  const { user, isAuthenticated } = useAuthStore();
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      switch (user.role) {
+        case 'doctor':
+          router.push('/doctor/prescriptions');
+          break;
+        case 'patient':
+          router.push('/patient/prescriptions');
+          break;
+        case 'admin':
+          router.push('/admin');
+          break;
+      }
+    }
+  }, [isAuthenticated, user, router]);
+
   return (
     <div className="relative h-screen w-full overflow-hidden">
       <video 

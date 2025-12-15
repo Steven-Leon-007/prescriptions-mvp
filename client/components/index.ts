@@ -5,3 +5,4 @@ export { Navbar } from './Navbar';
 export { Footer } from './Footer';
 export { AuthProvider } from './AuthProvider';
 export { ConditionalLayout } from './ConditionalLayout';
+export { ConfirmDialog } from './ConfirmDialog';

@@ -6,6 +6,7 @@ import { Input, Button } from '@/components';
 import { useState } from 'react';
 import { useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -58,13 +59,15 @@ const LoginPage = () => {
           <div className="w-full max-w-md">
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-4">
-                <Image
-                  src="/Nutrabiotics_Logo.svg"
-                  alt="Nutrabiotics Logo"
-                  width={40}
-                  height={40}
-                />
-                <h1 className="text-2xl font-bold text-[#361951]">
+                <Link href="/">
+                  <Image
+                    src="/Nutrabiotics_Logo.svg"
+                    alt="Nutrabiotics Logo"
+                    width={40}
+                    height={40}
+                  />
+                </Link>
+                <h1 className="text-2xl font-bold text-[#361951] flex self-end">
                   Accede al universo Nutrabiotics
                 </h1>
               </div>

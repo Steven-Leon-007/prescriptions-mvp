@@ -21,7 +21,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
       throttlers: [
         {
           ttl: seconds(60),
-          limit: 10,
+          limit: 50,
         }
       ]
     }),
