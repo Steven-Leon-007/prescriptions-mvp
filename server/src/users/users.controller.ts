@@ -10,43 +10,43 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('users')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
   @Get('users')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   findAll(@Query() query: QueryUserDto) {
     return this.usersService.findAllWithFilters(query);
   }
 
   @Get('doctors')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   findDoctors(@Query('page') page?: number, @Query('limit') limit?: number) {
     return this.usersService.findDoctors(page, limit);
   }
 
   @Get('patients')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   findPatients(@Query('page') page?: number, @Query('limit') limit?: number) {
     return this.usersService.findPatients(page, limit);
   }
 
   @Get('users/:id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
 
   @Patch('users/:id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
   @Delete('users/:id')
-  @Roles(Role.ADMIN)
+  @Roles(Role.admin)
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
   }
