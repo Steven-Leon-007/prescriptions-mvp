@@ -187,7 +187,10 @@ export class PrescriptionsService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: [
+          { status: 'asc' },
+          { createdAt: 'desc' }
+        ],
         include: {
           items: true,
           author: {

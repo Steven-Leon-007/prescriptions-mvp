@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Mulish } from "next/font/google";
 import "./globals.css";
 import { AuthProvider, ConditionalLayout } from "@/components";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const mulish = Mulish({
   variable: "--font-mulish",
@@ -31,6 +33,18 @@ export default function RootLayout({ children, }: Readonly<{
             {children}
           </ConditionalLayout>
         </AuthProvider>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
       </body>
     </html>
   );
