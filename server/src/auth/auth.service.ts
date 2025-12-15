@@ -192,14 +192,14 @@ export class AuthService {
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
+      sameSite: 'none',
       maxAge: 15 * 60 * 1000,
     });
 
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true,
       secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
+      sameSite: this.configService.get('NODE_ENV') === 'production' ? 'none' : 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
