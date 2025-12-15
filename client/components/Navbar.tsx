@@ -14,7 +14,7 @@ export const Navbar = () => {
 
   const getHomeUrl = () => {
     if (!isAuthenticated || !user) return '/';
-    
+
     switch (user.role) {
       case 'doctor':
         return '/doctor/prescriptions';
@@ -33,29 +33,29 @@ export const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
             <Link href={getHomeUrl()} className="flex items-center">
-              <Image 
-                src="/logo-header-nutrabiotics.png" 
-                alt="Logo" 
-                width={150} 
+              <Image
+                src="/logo-header-nutrabiotics.png"
+                alt="Logo"
+                width={150}
                 height={40}
                 className="h-12 w-auto"
                 priority
               />
             </Link>
           </div>
-          
+
           <div className="flex items-center space-x-6">
             {isAuthenticated ? (
               <>
                 {user?.role === 'doctor' && (
                   <>
-                    <Link 
+                    <Link
                       href="/doctor/prescriptions"
                       className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
                     >
                       Prescripciones
                     </Link>
-                    <Link 
+                    <Link
                       href="/doctor/prescriptions/new"
                       className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
                     >
@@ -63,25 +63,39 @@ export const Navbar = () => {
                     </Link>
                   </>
                 )}
-                
+
                 {user?.role === 'patient' && (
-                  <Link 
+                  <Link
                     href="/patient/prescriptions"
                     className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
                   >
                     Mis Prescripciones
                   </Link>
                 )}
-                
+
                 {user?.role === 'admin' && (
-                  <Link 
-                    href="/admin"
-                    className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
-                  >
-                    Admin
-                  </Link>
+                  <>
+                    <Link
+                      href="/admin"
+                      className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
+                    >
+                      Panel Admin
+                    </Link>
+                    <Link
+                      href="/admin/users/new"
+                      className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
+                    >
+                      Crear Usuario
+                    </Link>
+                    <Link
+                      href="/admin/users"
+                      className="text-black hover:text-[#bc862d] transition-colors duration-200 font-medium"
+                    >
+                      Gestionar Usuarios
+                    </Link>
+                  </>
                 )}
-                <Button 
+                <Button
                   onClick={handleLogout}
                   variant="primary"
                   size="md"
