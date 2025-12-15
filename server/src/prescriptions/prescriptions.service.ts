@@ -118,7 +118,9 @@ export class PrescriptionsService {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: order as 'asc' | 'desc' },
+        orderBy: [
+          { status: 'asc' },
+          { createdAt: order as 'asc' | 'desc' }],
         include: {
           items: true,
           patient: {

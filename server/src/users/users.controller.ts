@@ -17,7 +17,7 @@ import {
 @ApiCookieAuth('cookie-auth')
 @Controller()
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   @Post('users')
   @Roles(Role.admin)
@@ -89,7 +89,7 @@ export class UsersController {
   }
 
   @Get('patients')
-  @Roles(Role.admin)
+  @Roles(Role.admin, Role.doctor)
   @ApiOperation({
     summary: 'Listar pacientes (Admin)',
     description: 'Obtiene lista paginada de usuarios con rol patient.',

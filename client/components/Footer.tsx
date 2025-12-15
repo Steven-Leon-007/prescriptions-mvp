@@ -48,12 +48,9 @@ export const Footer = () => {
                     </div>
                 </div>
 
-                {/* Línea separadora */}
                 <div className="border-t border-white/20 mb-8"></div>
 
-                {/* Columnas de información */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-8 text-center md:text-left">
-                    {/* Columna 1: Atención */}
                     <div>
                         <h3 className="text-[#e6a63e] font-bold text-lg mb-4">Atención</h3>
                         <ul className="space-y-2">
@@ -80,7 +77,6 @@ export const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Columna 2: De interés */}
                     <div>
                         <h3 className="text-[#e6a63e] font-bold text-lg mb-4">De interés</h3>
                         <ul className="space-y-2">
@@ -112,7 +108,6 @@ export const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Columna 3: Contact center */}
                     <div>
                         <h3 className="text-[#e6a63e] font-bold text-lg mb-4">Contact center</h3>
                         <ul className="space-y-2">
@@ -128,7 +123,6 @@ export const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Columna 4: Horarios de atención */}
                     <div>
                         <h3 className="text-[#e6a63e] font-bold text-lg mb-4">Horarios de atención</h3>
                         <div className="space-y-3">
@@ -143,7 +137,6 @@ export const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Columna 5: Certificados */}
                     <div>
                         <h3 className="text-[#e6a63e] font-bold text-lg mb-4">Certificados</h3>
                         <p className="text-sm mb-3">
@@ -160,7 +153,6 @@ export const Footer = () => {
                     </div>
                 </div>
 
-                {/* Copyright */}
                 <div className="border-t border-white/20 pt-6 text-center text-sm">
                     <p>&copy; {new Date().getFullYear()} Nutrabiotics SAS. Todos los derechos reservados.</p>
                 </div>
