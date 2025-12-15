@@ -21,7 +21,7 @@ export const AuthGuard = ({ children, requiredRole }: AuthGuardProps) => {
       }
 
       if (requiredRole && user?.role !== requiredRole) {
-        router.push('/'); // O redirigir a página de acceso denegado
+        router.push('/');
       }
     }
   }, [isAuthenticated, isLoading, user, requiredRole, router]);
