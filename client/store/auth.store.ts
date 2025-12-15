@@ -65,11 +65,9 @@ export const useAuthStore = create<AuthState>()(
 
       checkAuth: async () => {
         try {
-          // Intentar obtener el perfil con el token de la cookie
           const response = await authService.getProfile();
           get().setUser(response.user as User);
         } catch (error) {
-          // Si falla, intentar refrescar el token
           try {
             const refreshResponse = await authService.refresh();
             get().setUser(refreshResponse.user as User);

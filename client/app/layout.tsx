@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Mulish } from "next/font/google";
 import "./globals.css";
-import { AuthProvider, Navbar } from "@/components";
+import { AuthProvider, ConditionalLayout } from "@/components";
 
 const mulish = Mulish({
   variable: "--font-mulish",
@@ -18,9 +18,7 @@ export const metadata: Metadata = {
   description: "Sistema de gestión de prescripciones médicas",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
+export default function RootLayout({ children, }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
@@ -29,8 +27,9 @@ export default function RootLayout({
         className={`${mulish.variable} ${mulishMono.variable} antialiased`}
       >
         <AuthProvider>
-          <Navbar />
-          <main>{children}</main>
+          <ConditionalLayout>
+            {children}
+          </ConditionalLayout>
         </AuthProvider>
       </body>
     </html>
