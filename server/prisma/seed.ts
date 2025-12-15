@@ -9,6 +9,12 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
+
+    if (process.env.RUN_SEED !== 'true') {
+        console.log('Seed skipped');
+        return;
+    }
+    
     const userAdmin = await prisma.user.create({
         data: {
             email: 'admin@test.com',
