@@ -1,2 +1,18 @@
 @import "tailwindcss";
 
+@theme {
+  /* Paleta de colores personalizada */
+  --color-background: #fffefe;
+  --color-secondary: #361951;
+  --color-tertiary: #bc862d;
+  --color-text: #000000;
+
+  --color-primary: var(--color-secondary);
+  --color-accent: var(--color-tertiary);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}
+

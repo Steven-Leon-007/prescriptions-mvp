@@ -12,7 +12,7 @@ export const fetcher = async <T>(
   const response = await fetch(`${API_URL}${endpoint}`, {
     ...options,
     headers,
-    credentials: 'include', // Importante: incluir cookies en las peticiones
+    credentials: 'include',
   });
 
   if (!response.ok) {

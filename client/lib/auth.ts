@@ -25,32 +25,32 @@ export interface AuthResponse {
 
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    return fetcher<AuthResponse>('/auth/login', {
+    return fetcher<AuthResponse>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
   },
 
   register: async (data: RegisterData): Promise<AuthResponse> => {
-    return fetcher<AuthResponse>('/auth/register', {
+    return fetcher<AuthResponse>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   },
 
   logout: async (): Promise<void> => {
-    return fetcher('/auth/logout', {
+    return fetcher('/api/auth/logout', {
       method: 'POST',
     });
   },
 
   refresh: async (): Promise<AuthResponse> => {
-    return fetcher<AuthResponse>('/auth/refresh', {
+    return fetcher<AuthResponse>('/api/auth/refresh', {
       method: 'POST',
     });
   },
 
   getProfile: async (): Promise<AuthResponse> => {
-    return fetcher<AuthResponse>('/auth/profile');
+    return fetcher<AuthResponse>('/api/auth/profile');
   },
 };
