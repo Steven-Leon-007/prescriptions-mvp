@@ -11,6 +11,7 @@ import {
   ApiCookieAuth,
   ApiParam,
   ApiQuery,
+  ApiBody,
 } from '@nestjs/swagger';
 
 @ApiTags('Users')
@@ -24,6 +25,32 @@ export class UsersController {
   @ApiOperation({
     summary: 'Crear nuevo usuario (Admin)',
     description: 'Permite al administrador crear un nuevo usuario en el sistema.',
+  })
+  @ApiBody({
+    type: CreateUserDto,
+    description: 'Datos del usuario a crear',
+    examples: {
+      doctor: {
+        summary: 'Crear Doctor',
+        value: {
+          email: 'doctor@example.com',
+          password: 'Password123!',
+          name: 'Dr. Juan Pérez',
+          role: 'doctor',
+          specialty: 'Cardiología',
+        },
+      },
+      patient: {
+        summary: 'Crear Paciente',
+        value: {
+          email: 'paciente@example.com',
+          password: 'Password123!',
+          name: 'María García',
+          role: 'patient',
+          birthDate: '1990-05-15',
+        },
+      },
+    },
   })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })

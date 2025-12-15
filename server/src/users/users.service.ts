@@ -28,7 +28,9 @@ export class UsersService {
           }),
           ...(createUserDto.role === 'patient' && {
             patient: {
-              create: { birthDate: createUserDto.birthDate }
+              create: { 
+                birthDate: createUserDto.birthDate ? new Date(createUserDto.birthDate) : undefined 
+              }
             }
           })
         },
@@ -44,6 +46,7 @@ export class UsersService {
           throw new ConflictException('Unable to create user');
         }
       }
+      throw error;
     }
   }
 

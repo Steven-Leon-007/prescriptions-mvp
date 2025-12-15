@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 import { prescriptionsService } from '@/lib/prescriptions';
 import { Prescription, PrescriptionStatus } from '@/types';
 import { useRouter } from 'next/navigation';
-import { Card, Button } from '@/components';
+import { Card, Button, ConfirmDialog } from '@/components';
 import { useAuthStore } from '@/store';
+import { toast } from 'react-toastify';
 
 const PatientPrescriptionsPage = () => {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
@@ -15,6 +16,10 @@ const PatientPrescriptionsPage = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'consumed'>('all');
+  const [consumingId, setConsumingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null);
   const { user } = useAuthStore();
 
   const router = useRouter();
@@ -43,6 +48,58 @@ const PatientPrescriptionsPage = () => {
 
   const handlePrescriptionClick = (id: string) => {
     router.push(`/patient/prescriptions/${id}`);
+  };
+
+  const handleConsume = (e: React.MouseEvent, prescriptionId: string) => {
+    e.stopPropagation();
+    setSelectedPrescriptionId(prescriptionId);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmConsume = async () => {
+    if (!selectedPrescriptionId) return;
+
+    setShowConfirmDialog(false);
+    setConsumingId(selectedPrescriptionId);
+
+    try {
+      const updated = await prescriptionsService.consumePrescription(selectedPrescriptionId);
+      setPrescriptions(prevPrescriptions =>
+        prevPrescriptions.map(p => p.id === selectedPrescriptionId ? updated : p)
+      );
+      toast.success('Prescripción marcada como consumida exitosamente');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al consumir la prescripción';
+      toast.error(errorMessage);
+    } finally {
+      setConsumingId(null);
+      setSelectedPrescriptionId(null);
+    }
+  };
+
+  const handleDownloadPDF = async (e: React.MouseEvent, prescriptionId: string, prescriptionCode: string) => {
+    e.stopPropagation();
+    setDownloadingId(prescriptionId);
+
+    try {
+      const blob = await prescriptionsService.downloadPDF(prescriptionId);
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `prescripcion-${prescriptionCode}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success('PDF descargado exitosamente');
+    } catch (err: any) {
+      const errorMessage = err.message || 'Error al descargar el PDF';
+      toast.error(errorMessage);
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -110,8 +167,7 @@ const PatientPrescriptionsPage = () => {
                 {prescriptions.map((prescription) => (
                   <Card
                     key={prescription.id}
-                    onClick={() => handlePrescriptionClick(prescription.id)}
-                    className="cursor-pointer hover:shadow-md transition-shadow duration-300 rounded-lg border border-gray-200 bg-gray-50"
+                    className="rounded-lg border border-gray-200 bg-gray-50"
                   >
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
@@ -186,9 +242,34 @@ const PatientPrescriptionsPage = () => {
                         </div>
                       )}
 
-                      <div className="mt-4 pt-4 border-t border-gray-200">
-                        <button className="text-[#bc862d] hover:text-[#a67628] font-medium text-sm flex items-center gap-2 cursor-pointer">
-                          Ver detalles
+                      <div className="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                        <div className='flex flex-col gap-2 mb-5'>
+                          {prescription.status === PrescriptionStatus.pending && (
+                            <Button
+                              onClick={(e) => handleConsume(e, prescription.id)}
+                              variant="secondary"
+                              size="sm"
+                              disabled={consumingId === prescription.id}
+                              className="w-full"
+                            >
+                              {consumingId === prescription.id ? 'Procesando...' : 'Marcar como Consumida'}
+                            </Button>
+                          )}
+                          <Button
+                            onClick={(e) => handleDownloadPDF(e, prescription.id, prescription.code)}
+                            variant="primary"
+                            size="sm"
+                            disabled={downloadingId === prescription.id}
+                            className="w-full"
+                          >
+                            {downloadingId === prescription.id ? 'Descargando...' : 'Descargar PDF'}
+                          </Button>
+                        </div>
+                        <button
+                          onClick={() => handlePrescriptionClick(prescription.id)}
+                          className="text-[#bc862d] hover:text-[#a67628] font-medium text-sm flex items-center gap-2 cursor-pointer justify-center w-full"
+                        >
+                          Ver detalles completos
                           <svg
                             className="w-4 h-4"
                             fill="none"
@@ -234,6 +315,20 @@ const PatientPrescriptionsPage = () => {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        title="Confirmar consumo"
+        message="¿Estás seguro de marcar esta prescripción como consumida? Esta acción no se puede deshacer."
+        confirmLabel="Sí, marcar como consumida"
+        cancelLabel="Cancelar"
+        onConfirm={confirmConsume}
+        onCancel={() => {
+          setShowConfirmDialog(false);
+          setSelectedPrescriptionId(null);
+        }}
+        variant="secondary"
+      />
     </AuthGuard>
   );
 };
