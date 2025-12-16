@@ -2,6 +2,7 @@ import { Controller, Post, Body, Get, UseGuards, Res, Req } from '@nestjs/common
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { Public } from '../common/decorators/public.decorator';
+import { Roles, Role } from '../common/decorators/roles.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtRefreshAuthGuard } from '../common/guards/jwt-refresh-auth.guard';
 import type { Response, Request } from 'express';
@@ -18,15 +19,16 @@ import {
 export class AuthController {
   constructor(private authService: AuthService) { }
 
-  @Public()
+  @Roles(Role.admin)
   @Post('register')
+  @ApiCookieAuth('cookie-auth')
   @ApiOperation({
-    summary: 'Registrar nuevo usuario',
-    description: 'Crea una nueva cuenta de usuario. Dependiendo del rol, se crean registros adicionales (Doctor o Patient).',
+    summary: 'Registrar nuevo usuario (Solo Administradores)',
+    description: 'Crea una nueva cuenta de usuario. Solo administradores pueden crear usuarios. Dependiendo del rol, se crean registros adicionales (Doctor o Patient).',
   })
   @ApiResponse({
     status: 201,
-    description: 'Usuario registrado exitosamente. Los tokens se envían en cookies HttpOnly.',
+    description: 'Usuario registrado exitosamente.',
     schema: {
       example: {
         user: {
@@ -39,12 +41,14 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 400, description: 'Datos inválidos' })
+  @ApiResponse({ status: 401, description: 'No autenticado' })
+  @ApiResponse({ status: 403, description: 'Solo administradores pueden crear usuarios' })
   @ApiResponse({ status: 409, description: 'El email ya está registrado' })
   async register(
     @Body() registerDto: RegisterDto,
-    @Res({ passthrough: true }) res: Response,
+    @CurrentUser() adminUser: any,
   ) {
-    return this.authService.register(registerDto, res);
+    return this.authService.register(registerDto);
   }
 
   @Public()

@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import type { Response } from 'express';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class AuthService {
     private configService: ConfigService,
   ) { }
 
-  async register(registerDto: RegisterDto, res: Response) {
+  async register(registerDto: RegisterDto) {
     try {
       const hashedPassword = await bcrypt.hash(registerDto.password, 10);
 
@@ -47,10 +47,6 @@ export class AuthService {
         },
         include: { doctor: true, patient: true },
       });
-
-      const { accessToken, refreshToken } = await this.generateTokens(user.id);
-
-      this.setTokensCookies(res, accessToken, refreshToken);
 
       return {
         user: {
